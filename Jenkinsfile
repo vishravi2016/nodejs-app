@@ -1,6 +1,12 @@
 pipeline {
     agent any
- 
+    tools {
+        nodejs 'NodeJS20'
+    }
+    environment {
+        IMAGE_NAME=vishravi1975/nodejs-demo-app
+        IMAGE_TAG="latest"
+    }
 
     stages {
 
@@ -24,13 +30,27 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t node-js-demo-app .'
+                sh 'docker build -t $IMAGE_NAME:$IMAGE_TAG .'
             }
         }
 
-        stage('Run Docker Container') {
+        // stage('Run Docker Container') {
+        //     steps {
+        //         sh 'docker run -d -p 3000:3000 --name nodejs-container node-js-demo-app'
+        //     }
+        // }
+        stage('push image to docker hub'){
             steps {
-                sh 'docker run -d -p 3000:3000 --name nodejs-container node-js-demo-app'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]){
+                    sh '''
+                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                    docker push $IMAGE_NAME:$IMAGE_TAG
+                    '''
+                }
             }
         }
     }
