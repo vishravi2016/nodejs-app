@@ -4,7 +4,7 @@ pipeline {
         nodejs 'NodeJS20'
     }
     environment {
-        IMAGE_NAME=vishravi1975/nodejs-demo-app
+        IMAGE_NAME="vishravi1975/nodejs-demo-app"
         IMAGE_TAG="latest"
     }
 
